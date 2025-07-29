@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jarvis Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #0d0d0d;
+      font-family: 'Poppins', sans-serif;
+      color: #ffffff;
+      text-align: center;
+      padding: 50px;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+
+    form {
+      margin-bottom: 30px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 300px;
+      border-radius: 5px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #00bcd4;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .response {
+      background-color: #222;
+      padding: 20px;
+      border-radius: 10px;
+      width: 50%;
+      margin: 20px auto;
+    }
+
+    .logout-link {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: #fff;
+      text-decoration: none;
+      background-color: #ff5252;
+      padding: 8px 12px;
+      border-radius: 5px;
+    }
+
+    .mic-container {
+      margin-top: 30px;
+    }
+
+    .wave {
+      width: 100px;
+      height: 40px;
+      display: flex;
+      justify-content: space-between;
+      margin: auto;
+    }
+
+    .wave div {
+      width: 5px;
+      height: 100%;
+      background: #00bcd4;
+      animation: wave 1s infinite ease-in-out;
+    }
+
+    .wave div:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    .wave div:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+
+    .wave div:nth-child(4) {
+      animation-delay: 0.3s;
+    }
+
+    .wave div:nth-child(5) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes wave {
+      0%, 100% {
+        transform: scaleY(0.3);
+      }
+      50% {
+        transform: scaleY(1);
+      }
+    }
+
+    .song-list {
+      background-color: #333;
+      padding: 10px;
+      border-radius: 8px;
+      width: 300px;
+      margin: 20px auto;
+      text-align: left;
+    }
+
+    .song-list h3 {
+      color: #00bcd4;
+      text-align: center;
+    }
+
+    .song-list ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .song-list ul li {
+      padding: 5px;
+      border-bottom: 1px solid #555;
+    }
+  </style>
+</head>
+<body>
+
+  <a class="logout-link" href="{{ url_for('logout') }}">Logout</a>
+
+  <h1>Hello {{ user }} 👋, I am <span style="color: #00bcd4;">Jarvis</span></h1>
+
+  <form id="commandForm" method="POST">
+    <input type="text" name="command" id="commandInput" placeholder="Type or say a command..." required />
+    <button type="submit">Ask</button>
+    <button type="button" id="micBtn">🎤</button>
+  </form>
+
+  {% if response %}
+    <div class="response">
+      <p><strong>Jarvis:</strong> {{ response }}</p>
+    </div>
+  {% endif %}
+
+  {% if show_songs %}
+    <div class="song-list">
+      <h3>Available Songs 🎶</h3>
+      <ul>
+        {% for title in songs %}
+          <li>{{ title }}</li>
+        {% endfor %}
+      </ul>
+      <p style="color:#aaa; font-size: 0.9em;">Speak the exact song name to play it.</p>
+    </div>
+  {% endif %}
+
+  <div class="mic-container">
+    <div class="wave" id="wave">
+      <div></div><div></div><div></div><div></div><div></div>
+    </div>
+  </div>
+
+  <script>
+    const micBtn = document.getElementById("micBtn");
+    const commandInput = document.getElementById("commandInput");
+    const wave = document.getElementById("wave");
+
+    wave.style.display = "none"; // Hide initially
+
+    micBtn.addEventListener("click", () => {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("Speech Recognition not supported in this browser.");
+        return;
+      }
+
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = 'en-IN';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        wave.style.display = "flex";
+      };
+
+      recognition.onend = () => {
+        wave.style.display = "none";
+      };
+
+      recognition.onresult = (event) => {
+        const speechResult = event.results[0][0].transcript;
+        commandInput.value = speechResult;
+        document.getElementById("commandForm").submit();
+      };
+
+      recognition.onerror = (event) => {
+        alert("Speech recognition error: " + event.error);
+        wave.style.display = "none";
+      };
+
+      recognition.start();
+    });
+  </script>
+</body>
+</html>
