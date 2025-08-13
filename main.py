@@ -19,9 +19,9 @@ import google.generativeai as genai
 recognizer = sr.Recognizer()    #It helps to take speech recognition functionality
 engine=pyttsx3.init()
 
-genai.configure(api_key="AIzaSyDB4bSbIoWDTzhCJYkclrBoeYK6PSWj2Jk")
+genai.configure(api_key="AI........................................Jk")
 model = genai.GenerativeModel(model_name="gemini-2.0-flash")
-weather_api_key = "8564ef55fe62399ca6a7484614596d62"
+weather_api_key = "85....................d62"
 def speak(text):
     print(f"[🗣️ Jarvis will say]: {text[:100]}...")  # print first 100 chars
 
